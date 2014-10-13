@@ -1,0 +1,19 @@
+{
+  "name": "Mocker",
+  "version": "0.0.2",
+  "description": "Mock JSON",
+  "main": "mock.js",
+  "bin" : {"mock":"./bin/mock"},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "JSON",
+    "Mocker"
+  ],
+  "author": "daiying.zhang",
+  "license": "ISC",
+  "dependencies": {
+    "optimist":"~0.6.1"
+  }
+}
