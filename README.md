@@ -1,0 +1,4 @@
+mock.js
+=======
+
+Simple Mocker
