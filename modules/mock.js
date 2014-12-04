@@ -51,10 +51,10 @@ function getHTML(host, path, cbk) {
 
 function getFileInfo(JSON_PATH, url){
     var pathName = url.pathname,
-        fileExt = pathName.match(/\.(\w+)/g),
+        fileExt = pathName.match(/\.(\w+)/g) || [],
         contentType;
 
-    if(fileExt.length && [".json", ".html", ".htm", ".js", ".css"].indexOf(fileExt[0])){
+    if(fileExt.length && [".json", ".html", ".htm", ".js", ".css"].indexOf(fileExt[0]) !== -1){
         contentType = getContentType(fileExt[0]);
         fileExt = "";
     }else{
