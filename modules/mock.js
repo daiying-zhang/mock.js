@@ -49,13 +49,42 @@ function getHTML(host, path, cbk) {
     req.end();
 }
 
+function getFileInfo(JSON_PATH, url){
+    var pathName = url.pathname,
+        fileExt = pathName.match(/\.(\w+)/g),
+        contentType;
+
+    if(fileExt.length && [".json", ".html", ".htm", ".js", ".css"].indexOf(fileExt[0])){
+        contentType = getContentType(fileExt[0]);
+        fileExt = "";
+    }else{
+        fileExt = ".json";
+        contentType = getContentType("json")
+    }
+
+    return {
+        filePath: JSON_PATH + url.href.replace(/([^\?]*)(\?.*)/,'$1') + fileExt,
+        contentType: contentType
+    }
+}
+
+function getContentType(fileExt){
+    return {
+        "json": "application/json;charset=utf-8",
+        "html": "text/html",
+        "htm": "text/html",
+        "js": "application/javascript",
+        "css": "text/css"
+    }[fileExt.replace(".", "")]
+}
+
 exports.startServer = function (port) {
     var http = require('http'),
         fs  = require('fs'),
         url = require('url'),
 
-        JSON_PATH = process.cwd(),
-        JSON_FILE_EXT = 'json';
+        JSON_PATH = process.cwd();
+        //JSON_FILE_EXT = 'json';
 
     //var now = new Date();
 
@@ -63,16 +92,17 @@ exports.startServer = function (port) {
 
     var server = http.createServer(function (req, res) {
 
-        console.log(CONSOLE_PREX + COLOR_START_GREEN + '[url]' +COLOR_END + ' ==> ' + req.url);
+        console.log(CONSOLE_PREX + COLOR_START_GREEN + '[url]' + COLOR_END + ' ==> ' + req.url);
 
-        var filePath = JSON_PATH + req.url.replace(/([^\?]*)(\?.*)/,'$1') + '.' + JSON_FILE_EXT,
-            stream = null,
+        var url = require('url').parse(req.url);
+        var fileInfo = getFileInfo(JSON_PATH, url),
+            filePath = fileInfo.filePath,
             jsonStr = '';
 
         fs.exists(filePath, function (exists) {
             if(exists){
                 console.log(CONSOLE_PREX + COLOR_LOG + ' geting data from "' + filePath + '" ...');
-                stream = fs.createReadStream(filePath);
+                /*stream = fs.createReadStream(filePath);
                 stream.on('data', function (chunk) {
                     jsonStr += chunk
                 });
@@ -91,7 +121,20 @@ exports.startServer = function (port) {
 
                     res.write(jsonStr);
                     res.end();
-                })
+                })*/
+
+
+                var stat = fs.statSync(filePath);
+
+                res.writeHead(200, {
+                    'Content-Type': fileInfo.contentType || 'application/json;charset=utf-8',
+                    'Content-Length': stat.size,
+                    'Access-Control-Allow-Origin' : '*'
+                });
+
+                var readStream = fs.createReadStream(filePath);
+                // We replaced all the event handlers with a simple call to readStream.pipe()
+                readStream.pipe(res);
             }else{
                 console.log(CONSOLE_PREX + COLOR_ERROR + filePath + '" not found.');
                 /*getHTML(req.headers.host, req.url, function (data) {
@@ -142,5 +185,5 @@ exports.help = function(){
 }
 
 exports.version = function(){
-    console.log('mock @ 0.1.0');
+    console.log('mock @ 0.2.0');
 }

@@ -13,7 +13,7 @@ exports.run = function () {
     var cmd = args._[0];
     var port = args.p || args.port;
 
-    console.log('cmd', cmd, JSON.stringify(args));
+    //console.log('cmd', cmd, JSON.stringify(args));
     //console.log(Object.keys(mock))
     //console.log(require('./config.js').color.COLOR_START_RED);
 
